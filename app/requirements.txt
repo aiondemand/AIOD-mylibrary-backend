@@ -1,0 +1,6 @@
+fastapi == 0.84.0
+uvicorn == 0.16.0
+pydantic[email]
+motor == 2.5.1
+python-dotenv
+python-keycloak == 3.3.0

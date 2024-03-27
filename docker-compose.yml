@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 services:
   api:
@@ -18,7 +18,7 @@ services:
     ports:
       - 37017:27017
     volumes:
-      - db:/data/db
+      - mylibrary-backend-db:/data/mylibrary-backend-db
 
 volumes:
-  db:
+  mylibrary-backend-db:

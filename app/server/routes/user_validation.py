@@ -4,8 +4,8 @@ from dotenv import load_dotenv
 load_dotenv()
 
 def is_valid_auth_user(user):
-    if "groups" not in user \
-        or "groups" in user and os.getenv("KEYCLOAK_ROLE") not in user["groups"]:
+    if "realm_access" not in user \
+        or "realm_access" in user and os.getenv("KEYCLOAK_ROLE") not in user["realm_access"]["roles"]:
         return False
     return True
 

@@ -9,7 +9,7 @@ from fastapi.encoders import jsonable_encoder
 load_dotenv()
 
 client = motor.motor_asyncio.AsyncIOMotorClient(os.environ["DB_URL"])
-database = client.marketplace
+database = client.mylibrary
 libraries_collection = database.get_collection(
     os.getenv("DB_LIBRARIES_COLLECTION")
 )

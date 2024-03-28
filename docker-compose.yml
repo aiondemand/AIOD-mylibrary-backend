@@ -1,7 +1,8 @@
-version: '3.8'
+version: "3.8"
 
 services:
   api:
+    container_name: mylibrary-backend-api
     build: ./app
     volumes:
       - .:/code
@@ -12,12 +13,12 @@ services:
     depends_on:
       - db
   db:
+    container_name: mylibrary-backend-db
     image: mongo
     ports:
       - 37017:27017
     volumes:
-      - db:/data/db
-
+      - mylibrary-backend-db:/data/mylibrary-backend-db
 
 volumes:
-  db:
+  mylibrary-backend-db:

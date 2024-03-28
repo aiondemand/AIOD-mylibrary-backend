@@ -92,7 +92,7 @@ async def delete_library_asset(
     ) 
                      
 @LibrariesRouter.post(
-    "/{id_user}/purchases", 
+    "/{id_user}/assets", 
     response_description="Add new items to a user's library. \
         If this is the first time a user acquires items, the library is created"
 )

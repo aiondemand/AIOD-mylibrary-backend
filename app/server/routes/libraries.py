@@ -49,7 +49,11 @@ async def get_library(
     library = await retrieve_library(id_user)
     if library:
         return ResponseModel(library)
-    return ErrorResponseModel("Not found error", 404, "User library not found.")
+
+    raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail="User library not found.",
+    )
 
 @LibrariesRouter.get(
     "/{id_user}/assets", 
@@ -65,9 +69,14 @@ async def get_library_assets(
             detail="You do not have permission to get library assets.",
         )
     assets = await retrieve_library_assets(id_user)
-    if assets or assets == []:
+    if assets:
         return ResponseModel(assets)
-    return ErrorResponseModel("Not found error", 404, "User library not found.")
+
+    raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail="User library not found.",
+    )
+
 
 @LibrariesRouter.delete(
     "/{id_user}/assets", 

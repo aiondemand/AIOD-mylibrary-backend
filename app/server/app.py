@@ -14,11 +14,11 @@ app = FastAPI(
     docs_url=f"{url_prefix}/docs",
     swagger_ui_oauth2_redirect_url=f"{url_prefix}/docs/oauth2-redirect",
     swagger_ui_init_oauth={
-        "clientId": os.getenv("KEYCLOAK_CLIENT_ID_SWAGGER"),
-        "realm": os.getenv("KEYCLOAK_REALM"),
+        "clientId": os.getenv("ML_BACKEND_KEYCLOAK_CLIENT_ID_SWAGGER"),
+        "realm": os.getenv("ML_BACKEND_KEYCLOAK_REALM"),
         "appName": "AIoD Marketplace backend",
         "usePkceWithAuthorizationCodeGrant": True,
-        "scopes": os.getenv("KEYCLOAK_SCOPES"),
+        "scopes": os.getenv("ML_BACKEND_KEYCLOAK_SCOPES"),
     },
 )
 

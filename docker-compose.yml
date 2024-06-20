@@ -8,8 +8,6 @@ services:
       - .:/code
     ports:
       - '8090:8000'
-    environment:
-      - DB_URL=mongodb://db/myTestDB
     depends_on:
       - db
   db:

@@ -40,15 +40,15 @@ from keycloak import KeycloakOpenID, KeycloakError
 load_dotenv()
 
 
-oidc = OpenIdConnect(openIdConnectUrl=os.getenv("KEYCLOAK_OPENID_CONNECT_URL"), auto_error=False)
+oidc = OpenIdConnect(openIdConnectUrl=os.getenv("ML_BACKEND_KEYCLOAK_OPENID_CONNECT_URL"), auto_error=False)
 
 
-client_secret = os.getenv("KEYCLOAK_CLIENT_SECRET")
+client_secret = os.getenv("ML_BACKEND_KEYCLOAK_CLIENT_SECRET")
 keycloak_openid = KeycloakOpenID(
-    server_url=os.getenv("KEYCLOAK_URL"),
-    client_id=os.getenv("KEYCLOAK_CLIENT_ID"),
+    server_url=os.getenv("ML_BACKEND_KEYCLOAK_URL"),
+    client_id=os.getenv("ML_BACKEND_KEYCLOAK_CLIENT_ID"),
     client_secret_key=client_secret,
-    realm_name=os.getenv("KEYCLOAK_REALM"),
+    realm_name=os.getenv("ML_BACKEND_KEYCLOAK_REALM"),
     verify=True,
 )
 

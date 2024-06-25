@@ -33,3 +33,4 @@ def test_authorization(user: Json = Depends(get_current_user)) -> dict:
     """
     return {"msg": "success", "user": user}
 
+

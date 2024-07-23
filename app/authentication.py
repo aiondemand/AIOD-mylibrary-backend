@@ -36,21 +36,24 @@ from dotenv import load_dotenv
 from fastapi import HTTPException, Security, status
 from fastapi.security import OpenIdConnect
 from keycloak import KeycloakOpenID, KeycloakError
+from server.config import KEYCLOAK_CONFIG
 
 load_dotenv()
 
 
-oidc = OpenIdConnect(openIdConnectUrl=os.getenv("ML_BACKEND_KEYCLOAK_OPENID_CONNECT_URL"), auto_error=False)
+oidc = OpenIdConnect(openIdConnectUrl=KEYCLOAK_CONFIG.get("openid-connect-url"), auto_error=False)
 
 
-client_secret = os.getenv("ML_BACKEND_KEYCLOAK_CLIENT_SECRET")
+client_secret = KEYCLOAK_CONFIG.get("client-secret")
+
 keycloak_openid = KeycloakOpenID(
-    server_url=os.getenv("ML_BACKEND_KEYCLOAK_URL"),
-    client_id=os.getenv("ML_BACKEND_KEYCLOAK_CLIENT_ID"),
+    server_url=KEYCLOAK_CONFIG.get("url"),
+    client_id=KEYCLOAK_CONFIG.get("client-id"),
     client_secret_key=client_secret,
-    realm_name=os.getenv("ML_BACKEND_KEYCLOAK_REALM"),
+    realm_name=KEYCLOAK_CONFIG.get("realm"),
     verify=True,
 )
+print(f"Keycloak configured: {KEYCLOAK_CONFIG}")
 
 
 async def get_current_user(token=Security(oidc)) -> dict:
@@ -69,8 +72,21 @@ async def get_current_user(token=Security(oidc)) -> dict:
         )
     try:
         token = token.replace("Bearer ", "")
-        return keycloak_openid.userinfo(token)  # perform a request to keycloak
-    except KeycloakError as e:
+        # return keycloak_openid.userinfo(token)  # perform a request to keycloak
+    
+        # query the authorization server to determine the active state of this token and to
+        # determine meta-information.
+        print(f"Token: {token}")
+        userinfo = keycloak_openid.introspect(token)
+        print(f"Userinfo: {userinfo}")
+
+        if not userinfo.get("active", False):
+            logging.error("Invalid userinfo or inactive user.")
+            raise KeycloakError("Invalid userinfo or inactive user")  # caught below
+        
+        return userinfo
+
+    except Exception as e:
         logging.error(f"Error while checking the access token: '{e}'")
         error_msg = e.error_message
         if isinstance(error_msg, bytes):

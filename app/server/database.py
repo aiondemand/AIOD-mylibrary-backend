@@ -90,7 +90,6 @@ async def add_library(library_data: dict):
 
 # ToDo: 
 # - refactor code
-# - check that duplicated assets are not inserted
 # - update assets added date?
 async def add_assets_to_library(
         id_user: str, 
@@ -113,16 +112,25 @@ async def add_assets_to_library(
         
         return library_helper(new_library)
     else:
-        updated_assets = res['assets'] + jsonable_encoder(new_assets_data)
-        updated_data = {
-            "assets": updated_assets
-        }
-        updated_result = await libraries_collection.update_one(
-            {"id_user": id_user}, {"$set": updated_data}
-        )
-        updated_library = await libraries_collection.find_one({"id_user": id_user})
+        existing_assets = res['assets']
+        updated_assets = existing_assets.copy()
+        print(existing_assets)
+        
+        for new_asset in new_assets_data:
+            if not any(existing_asset['identifier'] == new_asset.identifier for existing_asset in existing_assets):
+                updated_assets.append(new_asset.dict())
+        
+        if len(updated_assets) > len(existing_assets):
+            updated_data = {
+                "assets": updated_assets,
+                "modified_at": int(time.time())
+            }
+            await libraries_collection.update_one(
+                { "id_user": id_user }, { "$set": updated_data }
+            )
+            updated_library = await libraries_collection.find_one({ "id_user": id_user })
 
-        return library_helper(updated_library)
+            return library_helper(updated_library)
     
 async def delete_asset_from_library(
         id_user: str, 

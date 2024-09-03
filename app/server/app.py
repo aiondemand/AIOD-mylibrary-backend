@@ -2,6 +2,7 @@ from pydantic import Json
 from fastapi import Depends, FastAPI
 from authentication import get_current_user
 from server.routes.libraries import LibrariesRouter
+from server.config import KEYCLOAK_CONFIG
 
 import os
 
@@ -14,11 +15,11 @@ app = FastAPI(
     docs_url=f"{url_prefix}/docs",
     swagger_ui_oauth2_redirect_url=f"{url_prefix}/docs/oauth2-redirect",
     swagger_ui_init_oauth={
-        "clientId": os.getenv("KEYCLOAK_CLIENT_ID_SWAGGER"),
-        "realm": os.getenv("KEYCLOAK_REALM"),
+        "clientId": KEYCLOAK_CONFIG.get("client-id-swagger"),
+        "realm": KEYCLOAK_CONFIG.get("realm"),
         "appName": "AIoD Marketplace backend",
         "usePkceWithAuthorizationCodeGrant": True,
-        "scopes": os.getenv("KEYCLOAK_SCOPES"),
+        "scopes": KEYCLOAK_CONFIG.get("scopes"),
     },
 )
 
@@ -32,4 +33,5 @@ def test_authorization(user: Json = Depends(get_current_user)) -> dict:
     Returns the user, if authenticated correctly.
     """
     return {"msg": "success", "user": user}
+
 

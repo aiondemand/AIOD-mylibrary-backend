@@ -1,17 +1,22 @@
-import os
 import time
 import motor.motor_asyncio
 
+from server.config import DB_CONFIG
 from dotenv import load_dotenv
 from bson.objectid import ObjectId
 from fastapi.encoders import jsonable_encoder
 
+
 load_dotenv()
 
-client = motor.motor_asyncio.AsyncIOMotorClient(os.environ["DB_URL"])
+try:
+    client = motor.motor_asyncio.AsyncIOMotorClient(DB_CONFIG.get('url'))
+except Exception as e:
+    raise SystemExit(f"Could not connect to MongoDB: {e}")
+    
 database = client.mylibrary
 libraries_collection = database.get_collection(
-    os.getenv("DB_LIBRARIES_COLLECTION")
+    DB_CONFIG.get('collection')
 )
 
 ## Library

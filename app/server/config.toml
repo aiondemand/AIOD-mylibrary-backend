@@ -1,0 +1,4 @@
+# Information on which database to connect to
+[database]
+url = "mongodb://db/libraries"
+collection = "asset-libraries"

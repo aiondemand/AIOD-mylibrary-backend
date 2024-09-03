@@ -5,15 +5,13 @@ load_dotenv()
 
 def is_valid_auth_user(user):
     if "realm_access" not in user \
-        or "realm_access" in user and os.getenv("KEYCLOAK_ROLE") not in user["realm_access"]["roles"]:
+        or "realm_access" in user and os.getenv("ML_BACKEND_KEYCLOAK_ROLE") not in user["realm_access"]["roles"]:
         return False
     return True
 
 # ToDo: validation should by user role, not by ID
 def is_valid_admin_user(user):
     if not is_valid_auth_user(user):
-        return False
-    if user["sub"] != os.getenv("MKTPLC_ADMIN_ID"):
         return False
     return True
 

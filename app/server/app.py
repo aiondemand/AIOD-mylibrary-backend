@@ -25,7 +25,7 @@ app = FastAPI(
     },
 )
 
-app.include_router(LibrariesRouter, tags=["Libraries"], prefix="/api/libraries")
+app.include_router(LibrariesRouter, tags=["Libraries"], prefix=f"{url_prefix}/api/libraries")
 
 @app.get(url_prefix + "/", response_class=HTMLResponse)
 def home() -> str:

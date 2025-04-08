@@ -85,7 +85,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: ./app/DockerFile
+          file: ./app/Dockerfile
           tags:  aiod/mylibrary-backend-api:develop
           outputs: type=docker,dest=/tmp/aiod_my_library_backend_dev.tar
           cache-from: type=gha

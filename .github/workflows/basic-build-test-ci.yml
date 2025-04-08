@@ -96,7 +96,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: aiod_my_library_backend_dev
-          path: /tmp/aiod_my_library_backend_dev
+          path: /tmp/aiod_my_library_backend_dev.tar
   
 
   publish:

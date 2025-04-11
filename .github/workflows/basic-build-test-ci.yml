@@ -1,0 +1,151 @@
+name: CI/CD MyLibrary Backend build and test
+
+# This workflow will build docker image and run tests inside the container.
+# only executed if there are changes on: workflows folder, requirement.txt, DockerFile, docker-compose files and .env file
+
+on:
+  pull_request:
+    branches:
+      - main # executed on every pull request to main
+    
+    paths:
+      - '.github/workflows/**'
+      - ' app/requirements.txt'
+      - ' app/DockerFile
+      - ' docker-compose-dev-yml '
+      - ' docker-compose.yml'
+      - '.env'
+     
+    
+  push:
+    branches:
+      - main
+
+  release:
+    types: [published]
+
+  # allows to manually start a workflow run from the GitHub UI or using the GitHub API.
+  workflow_dispatch:
+    inputs:
+      push-image:
+        description: "Push image to docker hub"
+        required: false
+        type: boolean
+        default: false
+      push-description:
+        description: "Update docker hub description"
+        required: false
+        type: boolean
+        default: false
+      tag:
+        description: "Tag for the docker image"
+        required: false
+        default: "workflow-dispatch"
+
+
+jobs:
+
+  build-and-test:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+      
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      
+      - name: install deps
+        run: | 
+         python -m pip install --upgrade pip 
+         pip install -r ./app/requirements.txt
+
+      - name: run Tests
+        run: echo " TODO implement test on pytest"
+
+
+  docker-img:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      
+      - name: Log in to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push Docker image (Dev)
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./app/Dockerfile
+          tags:  aiod/mylibrary-backend-api:develop
+          outputs: type=docker,dest=/tmp/aiod_my_library_backend_dev.tar
+          cache-from: type=gha
+          cache-to: type=gha,mode=min
+      
+  
+      - name: Store Image dev
+        uses: actions/upload-artifact@v4
+        with:
+          name: aiod_my_library_backend_dev
+          path: /tmp/aiod_my_library_backend_dev.tar
+  
+
+  publish:
+    needs: [docker-img]
+    runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request'
+    steps:
+      - name: Set Develop Tag
+        if: github.ref == 'refs/heads/develop'
+        run: echo "IMAGE_TAGS=aiod/mylibrary-backend-api:develop" >> "$GITHUB_ENV"
+      
+      - name: Set Release Tag
+        if: github.event_name == 'release'
+        run: echo "IMAGE_TAGS=aiod/mylibrary-backend:latest,aiod/mylibrary-backend:${{ github.event.release.tag_name }}" >> "$GITHUB_ENV"
+      
+      - name: Set Dispatch Tag
+        if: github.event_name == 'workflow_dispatch'
+        run: echo "IMAGE_TAGS=aiod/mylibrary-backend:${{ inputs.tag }}" >> "$GITHUB_ENV"
+      - uses: actions/checkout@v4
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.AIOD_DOCKER_PAT }}
+      - name: Echo tags
+        run: echo $IMAGE_TAGS
+      - name: Build
+        if: (github.event_name != 'workflow_dispatch') || inputs.push-image
+        uses: docker/build-push-action@v5
+        with:
+          push: true
+          context: .
+          file: ./Dockerfile
+          tags: ${{ env.IMAGE_TAGS }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=min
+      - name: Update repository description
+        if: (github.event_name == 'release') || inputs.push-description
+        uses: peter-evans/dockerhub-description@v4
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.AIOD_DOCKER_PAT }}
+          repository: aiod/mylibrary-backend
+          readme-filepath: ./docker-description.md
+          short-description: "My library Backend API for AI on Demand."
+
+      - name: Verify pushed image (optional)
+        run: docker pull ${{ env.IMAGE_TAGS }}

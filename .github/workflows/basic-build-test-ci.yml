@@ -1,8 +1,7 @@
 name: CI/CD MyLibrary Backend build and test
 
 # This workflow will build docker image and run tests inside the container.
-# This workflow is only executed if there is pull request with change in pyproject.toml dependencies,
-# or in Dockerfile, or in docker workflow.
+# only executed if there are changes on: workflows folder, requirement.txt, DockerFile, docker-compose files and .env file
 
 on:
   pull_request:
@@ -11,7 +10,11 @@ on:
     
     paths:
       - '.github/workflows/**'
-      - 'app/**'
+      - ' app/requirements.txt'
+      - ' app/DockerFile
+      - ' docker-compose-dev-yml '
+      - ' docker-compose.yml'
+      - '.env'
      
     
   push:

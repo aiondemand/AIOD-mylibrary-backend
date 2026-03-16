@@ -1,3 +1,5 @@
+**IMPORTANT NOTE:** This project is archived as functionality implemented in this repository is now provided by the [AIoD REST API](https://github.com/aiondemand/AIOD-rest-api) (see User `/bookmarks` endpoints). The [AIoD Catalogue frontend](https://github.com/aiondemand/AIOD-marketplace-frontend) now submits the requests to the AIoD REST API for bookmarks management. 
+
 # AIoD Marketplace backend
 
 ## Description
